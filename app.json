@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "DocSum",
+    "slug": "docsum",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "docsum",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

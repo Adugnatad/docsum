@@ -1,0 +1,6 @@
+{
+  "name": "DocSum",
+  "description": "AI Document Summarizer for key insights, action items, financial figures, risks, and executive summaries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
