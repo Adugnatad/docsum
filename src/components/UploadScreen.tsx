@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import {
   Upload,
   FileText,
@@ -38,7 +38,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
           "text/markdown",
           "application/json",
         ],
-        copyToCacheDirectory: true,
+        copyToCacheDirectory: false,
       });
 
       if (result.canceled) {
@@ -76,6 +76,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
 
       onSelectDocument(docData);
     } catch (error) {
+      console.log("Document upload error:", error);
       Alert.alert("Upload failed", "Unable to read the selected file.");
     }
   };
@@ -87,8 +88,8 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
     >
       <View className="space-y-6">
         {/* Screen Title & Description */}
-        <View className="space-y-2 mt-2">
-          <Text className="text-[26px] font-bold text-[#191c1e] tracking-tight leading-tight">
+        <View className="flex flex-col items-center mt-2 mb-6">
+          <Text className="text-[26px] font-bold text-[#191c1e] tracking-tight leading-tight mb-3">
             Analyze your documents
           </Text>
           <Text className="text-[#505f76] text-sm leading-relaxed">
@@ -172,64 +173,6 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
             </TouchableOpacity>
           </View>
         )}
-
-        {/* Quick Sample Documents Section */}
-        <View className="space-y-3 pt-2">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-xs font-bold text-[#505f76] tracking-wider uppercase">
-              Or test with sample files
-            </Text>
-            <Sparkles className="w-3.5 h-3.5 text-[#2036bd]" />
-          </View>
-
-          <View className="space-y-2.5">
-            {SAMPLE_DOCUMENTS.map((doc) => {
-              const isCurrent = selectedDocument?.id === doc.id;
-              return (
-                <TouchableOpacity
-                  key={doc.id}
-                  id={`sample-doc-${doc.id}`}
-                  onPress={() => onSelectDocument(doc)}
-                  activeOpacity={0.8}
-                  className={`p-3.5 rounded-xl border flex-row items-center justify-between ${
-                    isCurrent
-                      ? "bg-[#3e52d5]/10 border-[#2036bd]"
-                      : "bg-white border-[#e0e3e5]"
-                  }`}
-                >
-                  <View className="flex-row items-center gap-3 flex-1 pr-2">
-                    <View
-                      className={`w-8 h-8 rounded-lg items-center justify-center ${
-                        isCurrent ? "bg-[#2036bd]" : "bg-[#f2f4f6]"
-                      }`}
-                    >
-                      <FileText
-                        className={`w-4 h-4 ${isCurrent ? "text-white" : "text-[#505f76]"}`}
-                      />
-                    </View>
-                    <Text
-                      className="text-xs font-semibold text-[#191c1e]"
-                      numberOfLines={1}
-                    >
-                      {doc.name}
-                    </Text>
-                  </View>
-
-                  {isCurrent ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#2036bd]" />
-                  ) : (
-                    <View className="flex-row items-center gap-1">
-                      <Text className="text-[11px] text-[#2036bd] font-medium">
-                        Use
-                      </Text>
-                      <ArrowRight className="w-3 h-3 text-[#2036bd]" />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
       </View>
 
       {/* Bottom Action Button */}

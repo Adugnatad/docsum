@@ -60,49 +60,73 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
       case "star":
         return (
           <View className="w-8 h-8 rounded-full bg-[#2036bd] items-center justify-center">
-            <Star className="w-4 h-4 text-white fill-white" />
+            <Star
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white fill-white"
+            />
           </View>
         );
       case "checkbox":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#a44200] items-center justify-center">
-            <CheckSquare className="w-4 h-4 text-white" />
+            <CheckSquare
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white"
+            />
           </View>
         );
       case "file-text":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#505f76] items-center justify-center">
-            <FileText className="w-4 h-4 text-white" />
+            <FileText
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white"
+            />
           </View>
         );
       case "dollar-sign":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#15803d] items-center justify-center">
-            <DollarSign className="w-4 h-4 text-white" />
+            <DollarSign
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white"
+            />
           </View>
         );
       case "alert-triangle":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#ba1a1a] items-center justify-center">
-            <AlertTriangle className="w-4 h-4 text-white" />
+            <AlertTriangle
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white"
+            />
           </View>
         );
       case "calendar":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#3e52d5] items-center justify-center">
-            <Calendar className="w-4 h-4 text-white" />
+            <Calendar
+              color={"white"}
+              size={20}
+              className="w-4 h-4 text-white"
+            />
           </View>
         );
       case "users":
         return (
           <View className="w-8 h-8 rounded-lg bg-[#6b21a8] items-center justify-center">
-            <Users className="w-4 h-4 text-white" />
+            <Users color={"white"} size={20} className="w-4 h-4 text-white" />
           </View>
         );
       default:
         return (
           <View className="w-8 h-8 rounded-lg bg-[#2036bd] items-center justify-center">
-            <Target className="w-4 h-4 text-white" />
+            <Target color={"white"} size={20} className="w-4 h-4 text-white" />
           </View>
         );
     }
@@ -114,24 +138,8 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
       className="p-5 pt-2 max-w-md mx-auto w-full"
     >
       <View className="space-y-4">
-        {/* Document Title Header Badge */}
-        <View className="bg-[#3e52d5]/10 border border-[#3e52d5]/20 rounded-xl px-4 py-2 flex-row items-center justify-between mb-2">
-          <Text
-            className="font-semibold text-xs text-[#2036bd] flex-1 pr-2"
-            numberOfLines={1}
-          >
-            📄 {summary.documentTitle}
-          </Text>
-          <Text className="text-[10px] text-[#505f76] font-medium">
-            {new Date(summary.createdAt).toLocaleDateString([], {
-              month: "short",
-              day: "numeric",
-            })}
-          </Text>
-        </View>
-
         {/* Section Cards */}
-        <View className="space-y-3.5">
+        <View className="gap-3">
           {summary.sections.map((section) => {
             const isExpanded = !!expandedSections[section.id];
             const isCopied = copiedId === section.id;

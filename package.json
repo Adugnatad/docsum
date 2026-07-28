@@ -20,6 +20,7 @@
     "expo-document-picker": "~57.0.1",
     "expo-file-system": "~57.0.1",
     "expo-router": "^57.0.8",
+    "expo-secure-store": "^57.0.1",
     "expo-status-bar": "^57.0.1",
     "express": "^4.21.2",
     "lucide-react": "^0.546.0",

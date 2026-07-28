@@ -43,25 +43,12 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
       className="p-5 pt-2 max-w-md mx-auto w-full relative"
     >
       <View className="space-y-6">
-        {/* Document Banner */}
-        <View className="bg-[#3e52d5]/10 border border-[#3e52d5]/20 rounded-xl px-4 py-2.5 flex-row items-center justify-between">
-          <Text
-            className="text-xs text-[#2036bd] font-semibold"
-            numberOfLines={1}
-          >
-            📄 {documentName}
-          </Text>
-          <View className="bg-[#2036bd] px-2 py-0.5 rounded-full">
-            <Text className="text-white text-[10px] font-bold">Ready</Text>
-          </View>
-        </View>
-
         {/* Screen Title & Subtitle */}
-        <View className="space-y-2">
-          <Text className="text-[26px] font-bold text-[#191c1e] tracking-tight leading-tight">
+        <View className="space-y-2 mb-6">
+          <Text className="text-[25px] font-medium mb-4  text-[#191c1e] tracking-tight leading-tight">
             What should we focus on?
           </Text>
-          <Text className="text-[#505f76] text-sm leading-relaxed">
+          <Text className="text-[16px] text-[#191c1e]  leading-7">
             Select the key parameters you want DocSum to prioritize during the
             analysis.
           </Text>
@@ -69,11 +56,11 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
 
         {/* Suggested Focus Points */}
         <View className="space-y-3">
-          <Text className="text-xs font-bold text-[#757686] tracking-wider uppercase">
-            SUGGESTED FOCUS POINTS
+          <Text className="uppercase mb-6 font-bold text-[#757686] tracking-wider uppercase">
+            SUGGESTED FOCUS POINts
           </Text>
 
-          <View className="flex-row flex-wrap gap-2.5">
+          <View className="flex-row flex-wrap gap-2.5 mb-6">
             {focusPoints.map((point) => {
               const isSelected = point.isSelected;
               return (
@@ -82,17 +69,20 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
                   id={`chip-${point.id}`}
                   onPress={() => onToggleFocusPoint(point.id)}
                   activeOpacity={0.8}
-                  className={`px-4 py-2 rounded-full flex-row items-center gap-1.5 ${
+                  className={` px-6 py-2 rounded-full flex-row items-center gap-1.5 ${
                     isSelected
                       ? "bg-[#2036bd]"
                       : "bg-white border border-[#c5c5d7]"
                   }`}
                 >
                   {isSelected && (
-                    <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                    <Check
+                      color={"white"}
+                      className="w-3.5 h-3.5 text-white stroke-[3]"
+                    />
                   )}
                   <Text
-                    className={`text-xs font-semibold ${
+                    className={` font-medium ${
                       isSelected ? "text-white" : "text-[#191c1e]"
                     }`}
                   >
@@ -106,10 +96,8 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
 
         {/* Custom Parameter Section */}
         <View className="space-y-2.5 pt-2">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-xs font-bold text-[#191c1e]">
-              Custom Parameter
-            </Text>
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="  text-[#191c1e]">Custom Parameter</Text>
             <Text className="text-[10px] font-semibold text-[#757686] tracking-widest uppercase">
               OPTIONAL
             </Text>
@@ -156,10 +144,14 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5 text-white" />
-              <Text className="text-white font-bold text-base">
+              <Text className="text-white font-bold text-base mr-2">
                 Generate Summary
               </Text>
+              <Sparkles
+                size={20}
+                color={"white"}
+                className="w-5 h-5 text-white"
+              />
             </>
           )}
         </TouchableOpacity>
