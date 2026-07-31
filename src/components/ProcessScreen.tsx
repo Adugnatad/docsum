@@ -119,7 +119,11 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
                 activeOpacity={0.8}
                 className="absolute right-2.5 w-7 h-7 rounded-full bg-[#2036bd] items-center justify-center"
               >
-                <Plus className="w-4 h-4 text-white" />
+                <Plus
+                  color={"white"}
+                  size={16}
+                  className="w-4 h-4 text-white"
+                />
               </TouchableOpacity>
             )}
           </View>

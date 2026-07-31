@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import {
   Star,
   CheckSquare,
@@ -19,17 +20,17 @@ import {
   CheckCircle2,
 } from "lucide-react-native";
 import { SummaryResult, SummarySection } from "../types";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
 
 interface SummaryScreenProps {
   summary: SummaryResult;
   onNewDocument: () => void;
-  onExport: () => void;
 }
 
 export const SummaryScreen: React.FC<SummaryScreenProps> = ({
   summary,
   onNewDocument,
-  onExport,
 }) => {
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
@@ -46,13 +47,64 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
     }));
   };
 
-  const copySectionText = (section: SummarySection) => {
+  const copySectionText = async (section: SummarySection) => {
     const textToCopy =
       `${section.title}:\n` +
       section.items.map((item) => `- ${item}`).join("\n");
-    navigator.clipboard.writeText(textToCopy);
-    setCopiedId(section.id);
-    setTimeout(() => setCopiedId(null), 2000);
+
+    try {
+      if (Clipboard?.setStringAsync) {
+        await Clipboard.setStringAsync(textToCopy);
+      } else if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard?.writeText
+      ) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        throw new Error("Clipboard API is unavailable");
+      }
+
+      setCopiedId(section.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (error) {
+      console.warn("Copy to clipboard failed", error);
+    }
+  };
+
+  const exportAndShareData = async () => {
+    try {
+      const formattedText =
+        `Summary: ${summary.documentTitle || "Document"}\nDate: ${new Date(
+          summary.createdAt || Date.now(),
+        ).toLocaleDateString()}\n\n` +
+        summary.sections
+          .map(
+            (section) =>
+              `${section.title}:\n` +
+              section.items.map((item) => `- ${item}`).join("\n"),
+          )
+          .join("\n\n");
+
+      const fileUri =
+        FileSystem.documentDirectory +
+        `${summary.documentTitle || "docsum_summary.txt"}`;
+
+      await FileSystem.writeAsStringAsync(fileUri, formattedText, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri);
+      } else {
+        Alert.alert(
+          "Saved",
+          `File stored at: ${fileUri}\nUse a file manager to access it.`,
+        );
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      Alert.alert("Error", "Failed to export data.");
+    }
   };
 
   const renderSectionIcon = (iconType: string) => {
@@ -233,12 +285,13 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
       <View className="pt-4 pb-2 space-y-3 mt-auto">
         <TouchableOpacity
           id="export-summary-btn"
-          onPress={onExport}
+          onPress={exportAndShareData}
           activeOpacity={0.8}
-          className="w-full bg-[#2036bd] py-3.5 px-6 rounded-2xl shadow-lg flex-row items-center justify-center gap-2"
+          className="w-full bg-[#2036bd] py-3.5 px-6 mb-2 rounded-2xl shadow-lg flex-row items-center justify-center gap-2"
         >
-          <Share2 className="w-5 h-5 text-white" />
+          <Share2 size={20} color={"white"} className="w-5 h-5 text-white" />
           <Text className="text-white font-bold text-base">Export Summary</Text>
+          <View className="self-end my-4 flex flex-row mr-6"></View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -247,7 +300,9 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
           activeOpacity={0.7}
           className="w-full py-2 flex-row items-center justify-center gap-1.5"
         >
-          <Plus className="w-4 h-4 text-[#2036bd] stroke-[2.5]" />
+          <View className=" w-6 h-6 rounded-[100%] border border-[2px] border-[#2036bd] items-center justify-center">
+            <Plus color={"#2036bd"} size={19} className="w-4 h-4 text-white" />
+          </View>
           <Text className="text-[#2036bd] font-bold text-sm">New Document</Text>
         </TouchableOpacity>
       </View>

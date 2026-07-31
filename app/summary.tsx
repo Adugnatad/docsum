@@ -1,22 +1,20 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { useDocSum } from '../src/context/DocSumContext';
-import { SummaryScreen } from '../src/components/SummaryScreen';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useDocSum } from "../src/context/DocSumContext";
+import { SummaryScreen } from "../src/components/SummaryScreen";
 
 export default function SummaryRoute() {
-  const {
-    currentSummary,
-    setSelectedDocument,
-    setActiveTab,
-    setIsExportOpen,
-  } = useDocSum();
+  const { currentSummary, setSelectedDocument, setActiveTab, setIsExportOpen } =
+    useDocSum();
 
   if (!currentSummary) {
     return (
       <View className="flex-1 items-center justify-center p-6 text-center space-y-3">
-        <Text className="text-sm text-[#505f76]">No active summary available.</Text>
+        <Text className="text-sm text-[#505f76]">
+          No active summary available.
+        </Text>
         <TouchableOpacity
-          onPress={() => setActiveTab('upload')}
+          onPress={() => setActiveTab("upload")}
           activeOpacity={0.8}
           className="bg-[#2036bd] px-4 py-2 rounded-xl"
         >
@@ -31,9 +29,8 @@ export default function SummaryRoute() {
       summary={currentSummary}
       onNewDocument={() => {
         setSelectedDocument(null);
-        setActiveTab('upload');
+        setActiveTab("upload");
       }}
-      onExport={() => setIsExportOpen(true)}
     />
   );
 }
