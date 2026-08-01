@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { DocSumTab, DocumentData, FocusPoint, SummaryResult } from "../types";
 import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
+import { useRouter } from "expo-router";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
   { id: "key-takeaways", label: "Key Takeaways", isSelected: true },
@@ -54,6 +55,8 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     useState<string>("Parsing content...");
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -158,7 +161,8 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setCurrentSummary(resultSummary);
         saveToHistory(resultSummary);
-        setActiveTab("summary");
+        // setActiveTab("summary");
+        router.push("/summary");
       } else {
         throw new Error(data.error || "Failed to generate summary");
       }
@@ -203,7 +207,8 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
       };
       setCurrentSummary(fallbackSummary);
       saveToHistory(fallbackSummary);
-      setActiveTab("summary");
+      // setActiveTab("summary");
+      router.push("/summary");
     } finally {
       setIsProcessing(false);
     }

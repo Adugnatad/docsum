@@ -1,6 +1,6 @@
-import React from 'react';
-import { useDocSum } from '../src/context/DocSumContext';
-import { HistoryScreen } from '../src/components/HistoryScreen';
+import React from "react";
+import { useDocSum } from "../../src/context/DocSumContext";
+import { HistoryScreen } from "../../src/components/HistoryScreen";
 
 export default function HistoryRoute() {
   const {
@@ -16,7 +16,7 @@ export default function HistoryRoute() {
       history={history}
       onSelectSummary={(sum) => {
         setCurrentSummary(sum);
-        setActiveTab('summary');
+        setActiveTab("summary");
       }}
       onClearHistory={clearHistory}
       onDeleteSummary={deleteSummaryItem}

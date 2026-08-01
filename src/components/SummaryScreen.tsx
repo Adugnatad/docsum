@@ -187,7 +187,7 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
-      className="p-5 pt-2 max-w-md mx-auto w-full"
+      className="p-5 pt-2 max-w-md mx-auto w-full mt-10"
     >
       <View className="space-y-4">
         {/* Section Cards */}

@@ -42,11 +42,11 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
-      className="p-5 pt-2 max-w-md mx-auto w-full"
+      className="p-5 pt-2 max-w-md mx-auto w-full mt-10"
     >
       <View className="space-y-5">
         {/* Screen Header */}
-        <View className="flex-row items-center justify-between mt-2">
+        <View className="flex-row items-center justify-between my-2">
           <View>
             <Text className="text-[24px] font-bold text-[#191c1e] tracking-tight">
               Analysis History
@@ -71,7 +71,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 
         {/* Search Bar */}
         {history.length > 0 && (
-          <View className="relative flex-row items-center">
+          <View className="relative flex-row items-center mb-4">
             <Search className="w-4 h-4 absolute left-3.5 z-10 text-[#757686]" />
             <TextInput
               id="search-history-input"
@@ -106,7 +106,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                 id={`history-item-${item.id}`}
                 onPress={() => onSelectSummary(item)}
                 activeOpacity={0.8}
-                className="bg-white rounded-2xl p-4 border border-[#c5c5d7]/50 shadow-xs flex-row items-center justify-between"
+                className="bg-white rounded-2xl p-4 border border-[#c5c5d7]/50 shadow-xs flex-row items-center justify-between mb-3"
               >
                 <View className="flex-row items-center gap-3.5 flex-1 pr-2">
                   <View className="w-10 h-10 rounded-xl bg-[#3e52d5]/10 text-[#2036bd] items-center justify-center">

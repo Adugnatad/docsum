@@ -40,7 +40,7 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
-      className="p-5 pt-2 max-w-md mx-auto w-full relative"
+      className="p-5 pt-2 mt-10 max-w-md mx-auto w-full relative"
     >
       <View className="space-y-6">
         {/* Screen Title & Subtitle */}

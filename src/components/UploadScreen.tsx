@@ -38,7 +38,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
           "text/markdown",
           "application/json",
         ],
-        copyToCacheDirectory: false,
+        copyToCacheDirectory: true,
       });
 
       if (result.canceled) {
@@ -51,14 +51,29 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       }
 
       const { uri, name, size, mimeType } = asset;
+      let readableUri = uri;
+
+      if (uri.startsWith("content://")) {
+        const safeName = (name || "document")
+          .replace(/[^a-zA-Z0-9._-]/g, "_")
+          .slice(0, 80);
+        const destinationUri = `${FileSystem.cacheDirectory}${Date.now()}-${safeName}`;
+
+        await FileSystem.copyAsync({
+          from: uri,
+          to: destinationUri,
+        });
+
+        readableUri = destinationUri;
+      }
 
       let content = "";
       if (mimeType?.includes("pdf")) {
-        content = await FileSystem.readAsStringAsync(uri, {
+        content = await FileSystem.readAsStringAsync(readableUri, {
           encoding: FileSystem.EncodingType.Base64,
         });
       } else {
-        content = await FileSystem.readAsStringAsync(uri, {
+        content = await FileSystem.readAsStringAsync(readableUri, {
           encoding: FileSystem.EncodingType.UTF8,
         });
       }
@@ -84,7 +99,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
-      className="p-5 pt-2 max-w-md mx-auto w-full"
+      className="p-5 pt-2 max-w-md mx-auto my-10 w-full"
     >
       <View className="space-y-6">
         {/* Screen Title & Description */}
