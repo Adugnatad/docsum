@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { DocSumTab, DocumentData, FocusPoint, SummaryResult } from "../types";
 import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
 import { useRouter } from "expo-router";
+import Constants from "expo-constants";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
   { id: "key-takeaways", label: "Key Takeaways", isSelected: true },
@@ -57,6 +58,9 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   const router = useRouter();
+  const apiKey = Constants.expoConfig?.extra?.apiKey;
+
+  console.log("Resolved API key:", apiKey ? "present" : "missing");
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -131,6 +135,13 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     const activeLabels = focusPoints
       .filter((f) => f.isSelected)
       .map((f) => f.label);
+
+    console.log(
+      "Generating summary with focus points:",
+      activeLabels,
+      "and custom parameter:",
+      customParam,
+    );
 
     try {
       setTimeout(() => setProcessingStep("Extracting key parameters..."), 800);
