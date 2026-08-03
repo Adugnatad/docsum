@@ -68,7 +68,12 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       }
 
       let content = "";
-      if (mimeType?.includes("pdf")) {
+      if (
+        mimeType?.includes("pdf") ||
+        mimeType === "application/msword" ||
+        mimeType ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
         content = await FileSystem.readAsStringAsync(readableUri, {
           encoding: FileSystem.EncodingType.Base64,
         });

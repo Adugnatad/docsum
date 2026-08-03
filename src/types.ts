@@ -1,4 +1,5 @@
-export type DocSumTab = 'upload' | 'process' | 'summary' | 'history';
+import z from "zod";
+export type DocSumTab = "upload" | "process" | "summary" | "history";
 
 export interface DocumentData {
   id: string;
@@ -33,3 +34,19 @@ export interface SummaryResult {
   sections: SummarySection[];
   customParameter?: string;
 }
+
+const summarySectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  icon: z.string(),
+  items: z.array(z.string()),
+});
+
+export const summarySchema = z.object({
+  id: z.string(),
+  documentTitle: z.string(),
+  createdAt: z.number(),
+  focusPoints: z.array(z.string()),
+  sections: z.array(summarySectionSchema),
+  customParameter: z.string().optional(),
+});

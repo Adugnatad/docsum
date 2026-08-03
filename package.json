@@ -38,7 +38,8 @@
     "react-native-safe-area-context": "^5.8.0",
     "react-native-svg-transformer": "^1.5.3",
     "react-native-web": "^0.21.2",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

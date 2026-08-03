@@ -4,6 +4,8 @@ import { DocSumTab, DocumentData, FocusPoint, SummaryResult } from "../types";
 import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
+import { GoogleGenAI } from "@google/genai";
+import { summarySchema } from "../types";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
   { id: "key-takeaways", label: "Key Takeaways", isSelected: true },
@@ -58,9 +60,50 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   const router = useRouter();
-  const apiKey = Constants.expoConfig?.extra?.apiKey;
+  // const apiKey = Constants.expoConfig?.extra?.apiKey;
 
-  console.log("Resolved API key:", apiKey ? "present" : "missing");
+  const ai = new GoogleGenAI({
+    apiKey: Constants.expoConfig?.extra?.apiKey,
+  });
+  useEffect(() => {
+    const testGemini = async () => {
+      console.log("Testing Gemini AI API...");
+      const interaction = await ai.interactions.create({
+        model: "gemini-3.6-flash",
+        input: [
+          {
+            type: "text",
+            text: "give me a summary of this document based on the given parameters",
+          },
+          {
+            type: "text",
+            text:
+              "focus points: " +
+              focusPoints
+                .filter((fp) => fp.isSelected)
+                .map((fp) => fp.label)
+                .join(", ") +
+              "\ncustom parameter: " +
+              (currentSummary?.customParameter || "none"),
+          },
+          {
+            type: "text",
+            text: selectedDocument?.content || "",
+          },
+        ],
+        response_format: {
+          type: "text",
+          mime_type: "application/json",
+          schema: summarySchema,
+        },
+      });
+      // const summary = summarySchema.parse(
+      //   JSON.parse(interaction.output_text || "{}"),
+      // );
+      console.log(interaction.steps[1]?.content);
+    };
+    testGemini().catch((e) => console.error("Gemini test error:", e));
+  }, []);
 
   useEffect(() => {
     const loadHistory = async () => {
