@@ -18,15 +18,22 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
+  LucideIcon,
 } from "lucide-react-native";
 import { SummaryResult, SummarySection } from "../types";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
+import * as Icons from "lucide-react-native";
 
 interface SummaryScreenProps {
   summary: SummaryResult;
   onNewDocument: () => void;
 }
+type LucideIconComponent = React.ComponentType<{
+  color?: string;
+  size?: number;
+  className?: string;
+}>;
 
 export const SummaryScreen: React.FC<SummaryScreenProps> = ({
   summary,
@@ -47,10 +54,13 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
     }));
   };
 
+  const getItemText = (item: string | { content: string }) =>
+    typeof item === "string" ? item : item.content;
+
   const copySectionText = async (section: SummarySection) => {
     const textToCopy =
       `${section.title}:\n` +
-      section.items.map((item) => `- ${item}`).join("\n");
+      section.items.map((item) => `- ${getItemText(item)}`).join("\n");
 
     try {
       if (Clipboard?.setStringAsync) {
@@ -75,13 +85,13 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
     try {
       const formattedText =
         `Summary: ${summary.documentTitle || "Document"}\nDate: ${new Date(
-          summary.createdAt || Date.now(),
+          Date.now(),
         ).toLocaleDateString()}\n\n` +
         summary.sections
           .map(
             (section) =>
               `${section.title}:\n` +
-              section.items.map((item) => `- ${item}`).join("\n"),
+              section.items.map((item) => `- ${getItemText(item)}`).join("\n"),
           )
           .join("\n\n");
 
@@ -107,81 +117,36 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
     }
   };
 
-  const renderSectionIcon = (iconType: string) => {
-    switch (iconType) {
-      case "star":
-        return (
-          <View className="w-8 h-8 rounded-full bg-[#2036bd] items-center justify-center">
-            <Star
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white fill-white"
-            />
-          </View>
-        );
-      case "checkbox":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#a44200] items-center justify-center">
-            <CheckSquare
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white"
-            />
-          </View>
-        );
-      case "file-text":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#505f76] items-center justify-center">
-            <FileText
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white"
-            />
-          </View>
-        );
-      case "dollar-sign":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#15803d] items-center justify-center">
-            <DollarSign
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white"
-            />
-          </View>
-        );
-      case "alert-triangle":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#ba1a1a] items-center justify-center">
-            <AlertTriangle
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white"
-            />
-          </View>
-        );
-      case "calendar":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#3e52d5] items-center justify-center">
-            <Calendar
-              color={"white"}
-              size={20}
-              className="w-4 h-4 text-white"
-            />
-          </View>
-        );
-      case "users":
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#6b21a8] items-center justify-center">
-            <Users color={"white"} size={20} className="w-4 h-4 text-white" />
-          </View>
-        );
-      default:
-        return (
-          <View className="w-8 h-8 rounded-lg bg-[#2036bd] items-center justify-center">
-            <Target color={"white"} size={20} className="w-4 h-4 text-white" />
-          </View>
-        );
+  const getIconComponent = (iconName: string) => {
+    const componentName = iconName
+      .split(/[-_ ]+/)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join("");
+
+    const candidate = (Icons as Record<string, unknown>)[componentName];
+
+    if (
+      typeof candidate === "function" ||
+      (typeof candidate === "object" && candidate !== null)
+    ) {
+      return candidate as unknown as LucideIcon;
     }
+    console.log(typeof candidate);
+    return Icons.FileText as LucideIconComponent;
+  };
+
+  const renderSectionIcon = (iconName: string) => {
+    const Icon = getIconComponent(iconName);
+
+    return (
+      <View className="w-8 h-8 rounded-full bg-[#2036bd] items-center justify-center">
+        <Icon
+          color="white"
+          size={20}
+          className="w-4 h-4 text-white fill-white"
+        />
+      </View>
+    );
   };
 
   return (
@@ -209,7 +174,8 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
                   className="p-4 flex-row items-center justify-between"
                 >
                   <View className="flex-row items-center gap-3">
-                    {renderSectionIcon(section.icon)}
+                    {renderSectionIcon(String(section.icon))}
+                    {/* <Text> {String(section.icon)} </Text> */}
                     <Text className="text-base font-bold text-[#191c1e] tracking-tight">
                       {section.title}
                     </Text>
@@ -250,7 +216,7 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
                         >
                           <View className="w-1.5 h-1.5 bg-[#2036bd] rounded-xs mt-1.5" />
                           <Text className="text-xs text-[#454654] leading-relaxed flex-1">
-                            {item}
+                            {getItemText(item)}
                           </Text>
                         </View>
                       ))}

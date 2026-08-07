@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { DocSumTab, DocumentData, FocusPoint, SummaryResult } from "../types";
+import {
+  DocSumTab,
+  DocumentData,
+  FocusPoint,
+  summaryJsonSchema,
+  SummaryResult,
+} from "../types";
 import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { GoogleGenAI } from "@google/genai";
-import { summarySchema } from "../types";
+import { z } from "zod";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
   { id: "key-takeaways", label: "Key Takeaways", isSelected: true },
@@ -65,9 +71,15 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
   const ai = new GoogleGenAI({
     apiKey: Constants.expoConfig?.extra?.apiKey,
   });
-  useEffect(() => {
-    const testGemini = async () => {
-      console.log("Testing Gemini AI API...");
+
+  // useEffect(() => {
+
+  //   testGemini().catch((e) => console.error("Gemini test error:", e));
+  // }, []);
+
+  const generateSummary = async (customParam?: string) => {
+    console.log("Document Title", selectedDocument?.name);
+    try {
       const interaction = await ai.interactions.create({
         model: "gemini-3.6-flash",
         input: [
@@ -83,8 +95,7 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
                 .filter((fp) => fp.isSelected)
                 .map((fp) => fp.label)
                 .join(", ") +
-              "\ncustom parameter: " +
-              (currentSummary?.customParameter || "none"),
+              (customParam ? `, ${customParam}` : ""),
           },
           {
             type: "text",
@@ -94,16 +105,18 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
         response_format: {
           type: "text",
           mime_type: "application/json",
-          schema: summarySchema,
+          schema: summaryJsonSchema,
         },
       });
-      // const summary = summarySchema.parse(
-      //   JSON.parse(interaction.output_text || "{}"),
-      // );
-      console.log(interaction.steps[1]?.content);
-    };
-    testGemini().catch((e) => console.error("Gemini test error:", e));
-  }, []);
+      const summary = JSON.parse(interaction.output_text || "{}");
+      // console.log(summary);
+      console.log(interaction.output_text);
+      return summary;
+    } catch (error) {
+      console.error("Error generating summary:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -187,74 +200,77 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     try {
-      setTimeout(() => setProcessingStep("Extracting key parameters..."), 800);
-      setTimeout(() => setProcessingStep("Formatting AI insights..."), 1600);
-      const res = await fetch("/api/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          documentName: selectedDocument.name,
-          content: selectedDocument.content,
-          mimeType: selectedDocument.mimeType,
-          focusPoints: activeLabels,
-          customParameter: customParam,
-        }),
-      });
+      setProcessingStep("Formatting AI insights...");
 
-      const data = await res.json();
-
-      if (data.success && data.sections) {
+      await generateSummary().then((data: SummaryResult) => {
         const resultSummary: SummaryResult = {
           id: `summary-${Date.now()}`,
           documentTitle: data.documentTitle || selectedDocument.name,
-          createdAt: Date.now(),
           focusPoints: activeLabels,
           sections: data.sections,
-          customParameter: customParam,
         };
 
         setCurrentSummary(resultSummary);
         saveToHistory(resultSummary);
         // setActiveTab("summary");
         router.push("/summary");
-      } else {
-        throw new Error(data.error || "Failed to generate summary");
-      }
+      });
     } catch (err) {
       console.error("Summary generation error:", err);
       const fallbackSummary: SummaryResult = {
         id: `summary-${Date.now()}`,
         documentTitle: selectedDocument.name,
-        createdAt: Date.now(),
         focusPoints: activeLabels,
         sections: [
           {
             id: "key-takeaways",
             title: "Key Takeaways",
-            icon: "star",
+            icon: "file-text",
             items: [
-              `The proposed Q3 roadmap prioritizes infrastructure stability over new feature velocity to address technical debt in ${selectedDocument.name}.`,
-              "Budget allocation for the AI research department is set to increase by 15% starting next fiscal month.",
-              "Remote work policies are being formalized to support a hybrid model indefinitely.",
+              {
+                content: `The proposed Q3 roadmap prioritizes infrastructure stability over new feature velocity to address technical debt in ${selectedDocument.name}.`,
+              },
+              {
+                content:
+                  "Budget allocation for the AI research department is set to increase by 15% starting next fiscal month.",
+              },
+              {
+                content:
+                  "Remote work policies are being formalized to support a hybrid model indefinitely.",
+              },
             ],
           },
           {
             id: "action-items",
             title: "Action Items",
-            icon: "checkbox",
+            icon: "check-circle",
             items: [
-              "Finalize engineering quarter sprint commitments with team leads by Friday.",
-              "Submit revised Q3 hardware & cloud infra expenditure request to Finance.",
-              "Schedule all-hands briefing to review updated remote work security compliance rules.",
+              {
+                content:
+                  "Finalize engineering quarter sprint commitments with team leads by Friday.",
+              },
+              {
+                content:
+                  "Submit revised Q3 hardware & cloud infra expenditure request to Finance.",
+              },
+              {
+                content:
+                  "Schedule all-hands briefing to review updated remote work security compliance rules.",
+              },
             ],
           },
           {
             id: "overview",
             title: "Overview",
-            icon: "file-text",
+            icon: "info-circle",
             items: [
-              `Comprehensive executive summary of ${selectedDocument.name}, evaluating core deliverables, resource commitments, and operational milestones.`,
-              "Strategic focus centers on long-term maintainability, security compliance, and measurable ROI.",
+              {
+                content: `Comprehensive executive summary of ${selectedDocument.name}, evaluating core deliverables, resource commitments, and operational milestones.`,
+              },
+              {
+                content:
+                  "Strategic focus centers on long-term maintainability, security compliance, and measurable ROI.",
+              },
             ],
           },
         ],
