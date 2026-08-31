@@ -51,47 +51,27 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       }
 
       const { uri, name, size, mimeType } = asset;
-      let readableUri = uri;
 
-      if (uri.startsWith("content://")) {
-        const safeName = (name || "document")
-          .replace(/[^a-zA-Z0-9._-]/g, "_")
-          .slice(0, 80);
-        const destinationUri = `${FileSystem.cacheDirectory}${Date.now()}-${safeName}`;
-
-        await FileSystem.copyAsync({
-          from: uri,
-          to: destinationUri,
-        });
-
-        readableUri = destinationUri;
-      }
-
-      let content = "";
-      if (
-        mimeType?.includes("pdf") ||
-        mimeType === "application/msword" ||
-        mimeType ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      ) {
-        content = await FileSystem.readAsStringAsync(readableUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-      } else {
-        content = await FileSystem.readAsStringAsync(readableUri, {
-          encoding: FileSystem.EncodingType.UTF8,
-        });
+      let normalizedUri = uri;
+      if (normalizedUri?.startsWith("content://")) {
+        const cacheFileName = `${Date.now()}-${name}`;
+        const cacheUri = `${FileSystem.cacheDirectory}${cacheFileName}`;
+        try {
+          const copied: any = await FileSystem.copyAsync({
+            from: normalizedUri,
+            to: cacheUri,
+          });
+          normalizedUri = copied.uri;
+        } catch (copyError) {
+          console.warn("Unable to copy content URI to cache:", copyError);
+        }
       }
 
       const docData: DocumentData = {
-        id: `uploaded-${Date.now()}`,
-        name: name || "Uploaded document",
-        size: size || undefined,
+        name: name,
+        size: size || 0,
         type: mimeType || "text/plain",
-        content,
-        mimeType,
-        createdAt: Date.now(),
-        isSample: false,
+        uri: normalizedUri,
       };
 
       onSelectDocument(docData);
@@ -166,13 +146,6 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                   >
                     {selectedDocument.name}
                   </Text>
-                  {selectedDocument.isSample && (
-                    <View className="bg-[#3e52d5]/10 px-2 py-0.5 rounded-full">
-                      <Text className="text-[#2036bd] text-[10px] font-bold">
-                        Sample
-                      </Text>
-                    </View>
-                  )}
                 </View>
                 <Text className="text-xs text-[#505f76] mt-0.5">
                   {selectedDocument.size

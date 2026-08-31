@@ -3,14 +3,10 @@ import type { LucideIcon } from "lucide-react-native";
 export type DocSumTab = "upload" | "process" | "summary" | "history";
 
 export interface DocumentData {
-  id: string;
   name: string;
-  size?: number;
-  type?: string;
-  content: string;
-  mimeType?: string;
-  createdAt: number;
-  isSample?: boolean;
+  size: number;
+  type: string;
+  uri: string;
 }
 
 export interface FocusPoint {

@@ -8,10 +8,12 @@ import {
   SummaryResult,
 } from "../types";
 import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
+import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
+import { runFullSummaryFlow } from "../lib/gemini_apis";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
   { id: "key-takeaways", label: "Key Takeaways", isSelected: true },
@@ -64,58 +66,55 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     useState<string>("Parsing content...");
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
-
+  const [progress, setProgress] = useState("");
   const router = useRouter();
-  // const apiKey = Constants.expoConfig?.extra?.apiKey;
-
-  const ai = new GoogleGenAI({
-    apiKey: Constants.expoConfig?.extra?.apiKey,
-  });
-
-  // useEffect(() => {
-
-  //   testGemini().catch((e) => console.error("Gemini test error:", e));
-  // }, []);
 
   const generateSummary = async (customParam?: string) => {
     console.log("Document Title", selectedDocument?.name);
-    try {
-      const interaction = await ai.interactions.create({
-        model: "gemini-3.6-flash",
-        input: [
-          {
-            type: "text",
-            text: "give me a summary of this document based on the given parameters",
-          },
-          {
-            type: "text",
-            text:
-              "focus points: " +
-              focusPoints
-                .filter((fp) => fp.isSelected)
-                .map((fp) => fp.label)
-                .join(", ") +
-              (customParam ? `, ${customParam}` : ""),
-          },
-          {
-            type: "text",
-            text: selectedDocument?.content || "",
-          },
-        ],
-        response_format: {
-          type: "text",
-          mime_type: "application/json",
-          schema: summaryJsonSchema,
-        },
-      });
-      const summary = JSON.parse(interaction.output_text || "{}");
-      // console.log(summary);
-      console.log(interaction.output_text);
-      return summary;
-    } catch (error) {
-      console.error("Error generating summary:", error);
-      throw error;
-    }
+    if (!selectedDocument) return;
+    setProgress("");
+    const summary = await runFullSummaryFlow(selectedDocument, {
+      onStateChange: (state) => setProgress(state),
+    });
+    console.log(progress);
+    return summary;
+    // try {
+    //   const interaction = await ai.interactions.create({
+    //     model: "gemini-3.6-flash",
+    //     input: [
+    //       {
+    //         type: "text",
+    //         text: "give me a summary of this document based on the given parameters",
+    //       },
+    //       {
+    //         type: "text",
+    //         text:
+    //           "focus points: " +
+    //           focusPoints
+    //             .filter((fp) => fp.isSelected)
+    //             .map((fp) => fp.label)
+    //             .join(", ") +
+    //           (customParam ? `, ${customParam}` : ""),
+    //       },
+    //       {
+    //         type: "document",
+    //         uri: file.uri,
+    //         mime_type: file?.mimeType || "text/plain",
+    //       },
+    //     ],
+    //     response_format: {
+    //       type: "text",
+    //       mime_type: "application/json",
+    //       schema: summaryJsonSchema,
+    //     },
+    //   });
+    //   const summary = JSON.parse(interaction.output_text || "{}");
+    //   console.log(interaction.output_text);
+    //   return summary;
+    // } catch (error) {
+    //   console.error("Error generating summary:", error);
+    //   throw error;
+    // }
   };
 
   useEffect(() => {
@@ -202,82 +201,23 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setProcessingStep("Formatting AI insights...");
 
-      await generateSummary().then((data: SummaryResult) => {
-        const resultSummary: SummaryResult = {
-          id: `summary-${Date.now()}`,
-          documentTitle: data.documentTitle || selectedDocument.name,
-          focusPoints: activeLabels,
-          sections: data.sections,
-        };
+      await generateSummary();
+      // .then((data: SummaryResult) => {
+      //   const resultSummary: SummaryResult = {
+      //     id: `summary-${Date.now()}`,
+      //     documentTitle: data.documentTitle || selectedDocument.name,
+      //     focusPoints: activeLabels,
+      //     sections: data.sections,
+      //   };
 
-        setCurrentSummary(resultSummary);
-        saveToHistory(resultSummary);
-        // setActiveTab("summary");
-        router.push("/summary");
-      });
+      //   setCurrentSummary(resultSummary);
+      //   saveToHistory(resultSummary);
+      //   // setActiveTab("summary");
+      //   router.push("/summary");
+      // });
     } catch (err) {
       console.error("Summary generation error:", err);
-      const fallbackSummary: SummaryResult = {
-        id: `summary-${Date.now()}`,
-        documentTitle: selectedDocument.name,
-        focusPoints: activeLabels,
-        sections: [
-          {
-            id: "key-takeaways",
-            title: "Key Takeaways",
-            icon: "file-text",
-            items: [
-              {
-                content: `The proposed Q3 roadmap prioritizes infrastructure stability over new feature velocity to address technical debt in ${selectedDocument.name}.`,
-              },
-              {
-                content:
-                  "Budget allocation for the AI research department is set to increase by 15% starting next fiscal month.",
-              },
-              {
-                content:
-                  "Remote work policies are being formalized to support a hybrid model indefinitely.",
-              },
-            ],
-          },
-          {
-            id: "action-items",
-            title: "Action Items",
-            icon: "check-circle",
-            items: [
-              {
-                content:
-                  "Finalize engineering quarter sprint commitments with team leads by Friday.",
-              },
-              {
-                content:
-                  "Submit revised Q3 hardware & cloud infra expenditure request to Finance.",
-              },
-              {
-                content:
-                  "Schedule all-hands briefing to review updated remote work security compliance rules.",
-              },
-            ],
-          },
-          {
-            id: "overview",
-            title: "Overview",
-            icon: "info-circle",
-            items: [
-              {
-                content: `Comprehensive executive summary of ${selectedDocument.name}, evaluating core deliverables, resource commitments, and operational milestones.`,
-              },
-              {
-                content:
-                  "Strategic focus centers on long-term maintainability, security compliance, and measurable ROI.",
-              },
-            ],
-          },
-        ],
-      };
-      setCurrentSummary(fallbackSummary);
-      saveToHistory(fallbackSummary);
-      // setActiveTab("summary");
+
       router.push("/summary");
     } finally {
       setIsProcessing(false);
