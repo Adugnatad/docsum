@@ -151,9 +151,12 @@ export async function summarizeDocument(
  */
 export async function runFullSummaryFlow(
   asset: DocumentAsset,
+  params: string,
   options: RunFullSummaryFlowOptions = {},
 ): Promise<string> {
-  const { prompt, onStateChange } = options;
+  const { onStateChange } = options;
+
+  const prompt = `Please summarize the document with the following focus points: ${params}`;
 
   onStateChange?.("UPLOADING");
   const { fileId } = await uploadDocument(asset);

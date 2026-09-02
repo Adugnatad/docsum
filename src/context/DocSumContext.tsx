@@ -69,52 +69,15 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
   const [progress, setProgress] = useState("");
   const router = useRouter();
 
-  const generateSummary = async (customParam?: string) => {
+  const generateSummary = async (params: string) => {
     console.log("Document Title", selectedDocument?.name);
     if (!selectedDocument) return;
     setProgress("");
-    const summary = await runFullSummaryFlow(selectedDocument, {
+    const summary = await runFullSummaryFlow(selectedDocument, params, {
       onStateChange: (state) => setProgress(state),
     });
-    console.log(progress);
-    return summary;
-    // try {
-    //   const interaction = await ai.interactions.create({
-    //     model: "gemini-3.6-flash",
-    //     input: [
-    //       {
-    //         type: "text",
-    //         text: "give me a summary of this document based on the given parameters",
-    //       },
-    //       {
-    //         type: "text",
-    //         text:
-    //           "focus points: " +
-    //           focusPoints
-    //             .filter((fp) => fp.isSelected)
-    //             .map((fp) => fp.label)
-    //             .join(", ") +
-    //           (customParam ? `, ${customParam}` : ""),
-    //       },
-    //       {
-    //         type: "document",
-    //         uri: file.uri,
-    //         mime_type: file?.mimeType || "text/plain",
-    //       },
-    //     ],
-    //     response_format: {
-    //       type: "text",
-    //       mime_type: "application/json",
-    //       schema: summaryJsonSchema,
-    //     },
-    //   });
-    //   const summary = JSON.parse(interaction.output_text || "{}");
-    //   console.log(interaction.output_text);
-    //   return summary;
-    // } catch (error) {
-    //   console.error("Error generating summary:", error);
-    //   throw error;
-    // }
+    const parsedSummary = JSON.parse(summary);
+    return parsedSummary as SummaryResult;
   };
 
   useEffect(() => {
@@ -201,20 +164,22 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setProcessingStep("Formatting AI insights...");
 
-      await generateSummary();
-      // .then((data: SummaryResult) => {
-      //   const resultSummary: SummaryResult = {
-      //     id: `summary-${Date.now()}`,
-      //     documentTitle: data.documentTitle || selectedDocument.name,
-      //     focusPoints: activeLabels,
-      //     sections: data.sections,
-      //   };
+      await generateSummary(
+        [...activeLabels, ...(customParam ? [customParam] : [])].join(", "),
+      ).then((data) => {
+        if (!data) return;
 
-      //   setCurrentSummary(resultSummary);
-      //   saveToHistory(resultSummary);
-      //   // setActiveTab("summary");
-      //   router.push("/summary");
-      // });
+        const resultSummary: SummaryResult = {
+          id: `summary-${Date.now()}`,
+          documentTitle: data.documentTitle,
+          focusPoints: data.focusPoints,
+          sections: data.sections,
+        };
+
+        setCurrentSummary(resultSummary);
+        saveToHistory(resultSummary);
+        router.push("/summary");
+      });
     } catch (err) {
       console.error("Summary generation error:", err);
 
