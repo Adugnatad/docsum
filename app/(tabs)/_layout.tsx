@@ -42,7 +42,7 @@ export default function TabsLayout() {
             options={{
               header: () => (
                 <View className="flex-row items-center gap-2 ml-[20px]">
-                  <ArrowLeft size={24} color="#2235bd" />
+                  {/* <ArrowLeft size={24} color="#2235bd" /> */}
                   <Text className="text-[#2235bd] text-2xl font-bold ml-4">
                     DocSum
                   </Text>
@@ -56,7 +56,11 @@ export default function TabsLayout() {
             options={{
               header: () => (
                 <View className="flex-row items-center gap-2 ml-[20px]">
-                  <ArrowLeft size={24} color="#2235bd" />
+                  <ArrowLeft
+                    size={24}
+                    color="#2235bd"
+                    onPress={() => router.back()}
+                  />
                   <Text className="text-[#2235bd] text-2xl font-bold ml-4">
                     DocSum
                   </Text>
@@ -70,9 +74,13 @@ export default function TabsLayout() {
             options={{
               header: () => (
                 <View className="flex-row items-center gap-2 ml-[20px]">
-                  <ArrowLeft size={24} color="#2235bd" />
+                  <ArrowLeft
+                    size={24}
+                    color="#2235bd"
+                    onPress={() => router.back()}
+                  />
                   <Text className="text-[#2235bd] text-2xl font-bold ml-4">
-                    Your History
+                    DocSum
                   </Text>
                 </View>
               ),
@@ -84,7 +92,11 @@ export default function TabsLayout() {
             options={{
               header: () => (
                 <View className="flex-row items-center gap-2 ml-[20px]">
-                  <ArrowLeft size={24} color="#2235bd" />
+                  <ArrowLeft
+                    size={24}
+                    color="#2235bd"
+                    onPress={() => router.back()}
+                  />
                   <Text className="text-[#2235bd] text-2xl font-bold ml-4">
                     Your Summary
                   </Text>
