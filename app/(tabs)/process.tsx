@@ -13,6 +13,7 @@ export default function ProcessRoute() {
     handleGenerateSummary,
     isProcessing,
     processingStep,
+    setCurrentSummary,
   } = useDocSum();
   const router = useRouter();
 
@@ -33,6 +34,7 @@ export default function ProcessRoute() {
       onToggleFocusPoint={handleToggleFocusPoint}
       onAddCustomFocusPoint={handleAddCustomFocusPoint}
       onGenerateSummary={async (customParam) => {
+        setCurrentSummary(null);
         await handleGenerateSummary(customParam);
         router.push("/summary");
       }}

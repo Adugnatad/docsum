@@ -104,7 +104,9 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
               <TouchableOpacity
                 key={item.id}
                 id={`history-item-${item.id}`}
-                onPress={() => onSelectSummary(item)}
+                onPress={() => {
+                  onSelectSummary(item);
+                }}
                 activeOpacity={0.8}
                 className="bg-white rounded-2xl p-4 border border-[#c5c5d7]/50 shadow-xs flex-row items-center justify-between mb-3"
               >
@@ -121,15 +123,6 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                       {item.documentTitle}
                     </Text>
                     <View className="flex-row items-center gap-2 mt-1">
-                      <View className="flex-row items-center gap-1">
-                        <Calendar className="w-3 h-3 text-[#757686]" />
-                        <Text className="text-[11px] text-[#505f76]">
-                          {new Date(item.createdAt).toLocaleDateString([], {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </Text>
-                      </View>
                       <Text className="text-[11px] text-[#505f76]">•</Text>
                       <Text className="text-[11px] text-[#505f76]">
                         {item.sections.length} sections

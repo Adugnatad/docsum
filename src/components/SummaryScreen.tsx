@@ -95,9 +95,13 @@ export const SummaryScreen: React.FC<SummaryScreenProps> = ({
           )
           .join("\n\n");
 
-      const fileUri =
-        FileSystem.documentDirectory +
-        `${summary.documentTitle || "docsum_summary.txt"}`;
+      const safeDocumentTitle = summary.documentTitle?.trim()
+        ? summary.documentTitle.endsWith(".txt")
+          ? summary.documentTitle
+          : `${summary.documentTitle}.txt`
+        : "docsum_summary.txt";
+
+      const fileUri = FileSystem.documentDirectory + safeDocumentTitle;
 
       await FileSystem.writeAsStringAsync(fileUri, formattedText, {
         encoding: FileSystem.EncodingType.UTF8,

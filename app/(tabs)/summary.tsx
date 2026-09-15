@@ -15,7 +15,10 @@ export default function SummaryRoute() {
           No active summary available.
         </Text>
         <TouchableOpacity
-          onPress={() => setActiveTab("upload")}
+          onPress={() => {
+            router.push("/");
+            setActiveTab("upload");
+          }}
           activeOpacity={0.8}
           className="bg-[#2036bd] px-4 py-2 rounded-xl"
         >
