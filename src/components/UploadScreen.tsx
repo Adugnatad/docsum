@@ -1,18 +1,8 @@
-import React from "react";
 import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
-import {
-  Upload,
-  FileText,
-  CheckCircle2,
-  Sparkles,
-  X,
-  FileCheck2,
-  ArrowRight,
-} from "lucide-react-native";
+import { Upload, X, FileCheck2 } from "lucide-react-native";
 import { DocumentData } from "../types";
-import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
 
 interface UploadScreenProps {
   selectedDocument: DocumentData | null;
@@ -104,14 +94,12 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
             id="upload-dropzone"
             className="border-2 border-dashed border-[#3e52d5]/40 rounded-2xl p-8 flex-col items-center justify-center text-center bg-white/60 shadow-xs"
           >
-            {/* Round Icon Container */}
             <View className="w-16 h-16 rounded-full bg-[#d3e4fe]/60 items-center justify-center mb-4">
               <View className="w-11 h-11 rounded-full bg-[#3e52d5]/15 items-center justify-center text-[#2036bd]">
-                <Upload className="w-6 h-6 stroke-[2.2] text-[#2036bd]" />
+                <Upload size={24} color="#2036bd" strokeWidth={2.2} />
               </View>
             </View>
 
-            {/* Call to action */}
             <Text className="text-lg font-bold text-[#191c1e] mb-1">
               Select a Document
             </Text>
@@ -119,7 +107,6 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
               PDF, Word, or TXT (Max 25MB)
             </Text>
 
-            {/* Browse Files Button */}
             <TouchableOpacity
               id="browse-files-btn"
               onPress={handlePickDocument}
@@ -136,7 +123,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
           <View className="bg-white rounded-2xl p-5 border border-[#3e52d5]/30 shadow-md flex-row items-center justify-between">
             <View className="flex-row items-center gap-3.5 flex-1 pr-2">
               <View className="w-12 h-12 rounded-xl bg-[#3e52d5]/10 items-center justify-center text-[#2036bd]">
-                <FileCheck2 className="w-6 h-6 text-[#2036bd]" />
+                <FileCheck2 size={24} color="#2036bd" />
               </View>
               <View className="flex-1">
                 <View className="flex-row items-center gap-2">
@@ -162,7 +149,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
               activeOpacity={0.7}
               className="w-8 h-8 rounded-full items-center justify-center bg-[#f2f4f6]"
             >
-              <X className="w-5 h-5 text-[#505f76]" />
+              <X size={20} color="#505f76" />
             </TouchableOpacity>
           </View>
         )}
@@ -170,7 +157,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
 
       {/* Bottom Action Button */}
       <View className="pt-6 pb-2 mt-auto">
-        <TouchableOpacity
+        {/* <TouchableOpacity
           id="continue-btn"
           onPress={onContinue}
           disabled={!selectedDocument}
@@ -186,7 +173,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
           >
             Continue
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </ScrollView>
   );

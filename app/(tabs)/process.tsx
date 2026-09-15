@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
+import { useRouter } from "expo-router";
 import { useDocSum } from "../../src/context/DocSumContext";
 import { ProcessScreen } from "../../src/components/ProcessScreen";
 
@@ -13,6 +14,7 @@ export default function ProcessRoute() {
     isProcessing,
     processingStep,
   } = useDocSum();
+  const router = useRouter();
 
   if (!selectedDocument) {
     return (
@@ -30,7 +32,10 @@ export default function ProcessRoute() {
       focusPoints={focusPoints}
       onToggleFocusPoint={handleToggleFocusPoint}
       onAddCustomFocusPoint={handleAddCustomFocusPoint}
-      onGenerateSummary={handleGenerateSummary}
+      onGenerateSummary={async (customParam) => {
+        await handleGenerateSummary(customParam);
+        router.push("/summary");
+      }}
       isProcessing={isProcessing}
       processingStep={processingStep}
     />

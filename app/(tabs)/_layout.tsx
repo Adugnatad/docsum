@@ -1,4 +1,4 @@
-import { Tabs, useRouter, useSegments } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -21,10 +21,6 @@ const navItems = [
 ];
 
 export default function TabsLayout() {
-  const router = useRouter();
-  const segments = useSegments();
-  const currentRoute = segments.length > 0 ? `/${segments[0]}` : "/";
-
   return (
     <SafeAreaView
       style={styles.container}
@@ -42,7 +38,6 @@ export default function TabsLayout() {
             options={{
               header: () => (
                 <View className="flex-row items-center gap-2 ml-[20px]">
-                  {/* <ArrowLeft size={24} color="#2235bd" /> */}
                   <Text className="text-[#2235bd] text-2xl font-bold ml-4">
                     DocSum
                   </Text>
@@ -111,26 +106,15 @@ export default function TabsLayout() {
       <View style={styles.bottomNav}>
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentRoute === item.route;
           return (
             item.route !== "/summary" && (
               <Pressable
                 key={item.route}
                 onPress={() => router.push(item.route)}
-                style={[
-                  styles.bottomNavItem,
-                  isActive && styles.bottomNavItemActive,
-                ]}
+                style={[styles.bottomNavItem]}
               >
-                <Icon size={24} color={isActive ? "#476550" : "#A8A29E"} />
-                <Text
-                  style={[
-                    styles.bottomNavLabel,
-                    isActive && styles.bottomNavLabelActive,
-                  ]}
-                >
-                  {item.label}
-                </Text>
+                <Icon size={24} color="#A8A29E" />
+                <Text style={styles.bottomNavLabel}>{item.label}</Text>
               </Pressable>
             )
           );

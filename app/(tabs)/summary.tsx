@@ -2,13 +2,11 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useDocSum } from "../../src/context/DocSumContext";
 import { SummaryScreen } from "../../src/components/SummaryScreen";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 
 export default function SummaryRoute() {
   const { currentSummary, setSelectedDocument, setActiveTab, setIsExportOpen } =
     useDocSum();
-
-  const router = useRouter();
 
   if (!currentSummary) {
     return (

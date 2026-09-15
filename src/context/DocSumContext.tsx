@@ -1,18 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import {
-  DocSumTab,
-  DocumentData,
-  FocusPoint,
-  summaryJsonSchema,
-  SummaryResult,
-} from "../types";
-import { SAMPLE_DOCUMENTS } from "../data/sampleDocs";
-import * as FileSystem from "expo-file-system/legacy";
-import { useRouter } from "expo-router";
-import Constants from "expo-constants";
-import { GoogleGenAI } from "@google/genai";
-import { z } from "zod";
+import { DocSumTab, DocumentData, FocusPoint, SummaryResult } from "../types";
 import { runFullSummaryFlow } from "../lib/gemini_apis";
 
 const DEFAULT_FOCUS_POINTS: FocusPoint[] = [
@@ -53,7 +41,7 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<DocSumTab>("upload");
   const [selectedDocument, setSelectedDocument] = useState<DocumentData | null>(
-    SAMPLE_DOCUMENTS[0],
+    null,
   );
   const [focusPoints, setFocusPoints] =
     useState<FocusPoint[]>(DEFAULT_FOCUS_POINTS);
@@ -67,7 +55,6 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [progress, setProgress] = useState("");
-  const router = useRouter();
 
   const generateSummary = async (params: string) => {
     console.log("Document Title", selectedDocument?.name);
@@ -178,12 +165,9 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setCurrentSummary(resultSummary);
         saveToHistory(resultSummary);
-        router.push("/summary");
       });
     } catch (err) {
       console.error("Summary generation error:", err);
-
-      router.push("/summary");
     } finally {
       setIsProcessing(false);
     }

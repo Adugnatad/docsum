@@ -1,7 +1,6 @@
 // @ts-ignore: Allow global CSS import without type declarations
 import "../global.css";
-import { DocSumProvider, useDocSum } from "../src/context/DocSumContext";
-
+import { DocSumProvider } from "@/src/context/DocSumContext";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
