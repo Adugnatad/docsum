@@ -136,6 +136,7 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setIsProcessing(true);
     setProcessingStep("Reading document text...");
+    setCurrentSummary(null);
 
     const activeLabels = focusPoints
       .filter((f) => f.isSelected)
@@ -151,23 +152,30 @@ export const DocSumProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setProcessingStep("Formatting AI insights...");
 
-      await generateSummary(
+      const data = await generateSummary(
         [...activeLabels, ...(customParam ? [customParam] : [])].join(", "),
-      ).then((data) => {
-        if (!data) return;
+      );
 
-        const resultSummary: SummaryResult = {
-          id: `summary-${Date.now()}`,
-          documentTitle: data.documentTitle,
-          focusPoints: data.focusPoints,
-          sections: data.sections,
-        };
+      if (!data) {
+        throw new Error("The AI summary did not return any content.");
+      }
 
-        setCurrentSummary(resultSummary);
-        saveToHistory(resultSummary);
-      });
+      const resultSummary: SummaryResult = {
+        id: `summary-${Date.now()}`,
+        documentTitle: data.documentTitle,
+        focusPoints: data.focusPoints,
+        sections: data.sections,
+      };
+
+      setCurrentSummary(resultSummary);
+      saveToHistory(resultSummary);
     } catch (err) {
       console.error("Summary generation error:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while generating your summary.";
+      throw new Error(message);
     } finally {
       setIsProcessing(false);
     }

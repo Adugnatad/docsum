@@ -4,6 +4,8 @@ import * as FileSystem from "expo-file-system/legacy";
 import { Upload, X, FileCheck2 } from "lucide-react-native";
 import { DocumentData } from "../types";
 
+const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024;
+
 interface UploadScreenProps {
   selectedDocument: DocumentData | null;
   onSelectDocument: (doc: DocumentData) => void;
@@ -41,6 +43,13 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
       }
 
       const { uri, name, size, mimeType } = asset;
+      if (size && size > MAX_FILE_SIZE_BYTES) {
+        Alert.alert(
+          "File too large",
+          "Please upload a file smaller than 4 MB.",
+        );
+        return;
+      }
 
       let normalizedUri = uri;
       if (normalizedUri?.startsWith("content://")) {
@@ -104,7 +113,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
               Select a Document
             </Text>
             <Text className="text-xs text-[#505f76] mb-6 font-medium">
-              PDF, Word, or TXT (Max 25MB)
+              PDF, Word, or TXT (Max 4MB)
             </Text>
 
             <TouchableOpacity

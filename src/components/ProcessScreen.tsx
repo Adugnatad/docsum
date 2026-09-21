@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Check, Plus, Sparkles } from "lucide-react-native";
+import { ErrorModal } from "./ErrorModal";
 import { FocusPoint } from "../types";
 
 interface ProcessScreenProps {
@@ -18,6 +19,8 @@ interface ProcessScreenProps {
   onGenerateSummary: (customParam?: string) => void;
   isProcessing: boolean;
   processingStep?: string;
+  errorMessage?: string | null;
+  onDismissError?: () => void;
 }
 
 export const ProcessScreen: React.FC<ProcessScreenProps> = ({
@@ -28,6 +31,8 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
   onGenerateSummary,
   isProcessing,
   processingStep,
+  errorMessage,
+  onDismissError,
 }) => {
   const [customInput, setCustomInput] = useState("");
 
@@ -187,6 +192,17 @@ export const ProcessScreen: React.FC<ProcessScreenProps> = ({
           </Text>
         </View>
       )}
+
+      <ErrorModal
+        isOpen={Boolean(errorMessage)}
+        title="Summary generation failed"
+        message={
+          errorMessage || "Something went wrong while generating your summary."
+        }
+        primaryActionLabel="Try Again"
+        onClose={() => onDismissError?.()}
+        onPrimaryAction={() => onDismissError?.()}
+      />
     </ScrollView>
   );
 };

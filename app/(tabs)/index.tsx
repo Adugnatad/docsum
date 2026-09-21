@@ -1,14 +1,22 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useDocSum } from "../../src/context/DocSumContext";
 import { router } from "expo-router";
 import { FileCheck2, Upload, X } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { DocumentData } from "@/src/types";
+import { ErrorModal } from "@/src/components/ErrorModal";
+
+const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 
 export default function UploadRoute() {
   const { selectedDocument, setSelectedDocument, setActiveTab } = useDocSum();
+  const [errorModal, setErrorModal] = React.useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
 
   const handlePickDocument = async () => {
     try {
@@ -35,6 +43,15 @@ export default function UploadRoute() {
 
       const { uri, name, size, mimeType } = asset;
 
+      if (size && size > MAX_FILE_SIZE_BYTES) {
+        setErrorModal({
+          isOpen: true,
+          title: "File too large",
+          message: "Please upload a file smaller than 4 MB.",
+        });
+        return;
+      }
+
       let normalizedUri = uri;
       if (normalizedUri?.startsWith("content://")) {
         const cacheFileName = `${Date.now()}-${name}`;
@@ -60,8 +77,16 @@ export default function UploadRoute() {
       setSelectedDocument(docData);
     } catch (error) {
       console.log("Document upload error:", error);
-      Alert.alert("Upload failed", "Unable to read the selected file.");
+      setErrorModal({
+        isOpen: true,
+        title: "Upload failed",
+        message: "Unable to read the selected file.",
+      });
     }
+  };
+
+  const closeErrorModal = () => {
+    setErrorModal((prev) => ({ ...prev, isOpen: false }));
   };
 
   return (
@@ -160,7 +185,7 @@ export default function UploadRoute() {
                 fontWeight: "500",
               }}
             >
-              PDF, Word, or TXT (Max 25MB)
+              PDF, Word, or TXT (Max 4MB)
             </Text>
 
             <TouchableOpacity
@@ -307,6 +332,15 @@ export default function UploadRoute() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        primaryActionLabel="Try Again"
+        onClose={closeErrorModal}
+        onPrimaryAction={closeErrorModal}
+      />
     </ScrollView>
   );
 }

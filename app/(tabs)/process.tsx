@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useDocSum } from "../../src/context/DocSumContext";
@@ -16,6 +16,7 @@ export default function ProcessRoute() {
     setCurrentSummary,
   } = useDocSum();
   const router = useRouter();
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   if (!selectedDocument) {
     return (
@@ -34,12 +35,24 @@ export default function ProcessRoute() {
       onToggleFocusPoint={handleToggleFocusPoint}
       onAddCustomFocusPoint={handleAddCustomFocusPoint}
       onGenerateSummary={async (customParam) => {
+        setGenerationError(null);
         setCurrentSummary(null);
-        await handleGenerateSummary(customParam);
-        router.push("/summary");
+
+        try {
+          await handleGenerateSummary(customParam);
+          router.push("/summary");
+        } catch (error) {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Something went wrong while generating your summary.";
+          setGenerationError(message);
+        }
       }}
       isProcessing={isProcessing}
       processingStep={processingStep}
+      errorMessage={generationError}
+      onDismissError={() => setGenerationError(null)}
     />
   );
 }
