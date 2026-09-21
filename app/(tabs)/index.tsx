@@ -341,7 +341,7 @@ export default function UploadRoute() {
       </View>
       <View style={{ marginTop: 24, alignItems: "center" }}>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={"ca-app-pub-9669689294353247/4256385258"}
           size={BannerAdSize.BANNER}
           requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         />

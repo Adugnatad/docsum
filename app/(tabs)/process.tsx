@@ -9,9 +9,12 @@ import {
 import { useDocSum } from "../../src/context/DocSumContext";
 import { ProcessScreen } from "../../src/components/ProcessScreen";
 
-const interstitialAd = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-  requestNonPersonalizedAdsOnly: true,
-});
+const interstitialAd = InterstitialAd.createForAdRequest(
+  "ca-app-pub-9669689294353247/5454926011",
+  {
+    requestNonPersonalizedAdsOnly: true,
+  },
+);
 
 export default function ProcessRoute() {
   const {
