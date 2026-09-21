@@ -7,6 +7,13 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { DocumentData } from "@/src/types";
 import { ErrorModal } from "@/src/components/ErrorModal";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  InterstitialAd,
+  AdEventType,
+} from "react-native-google-mobile-ads";
 
 const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 
@@ -332,7 +339,13 @@ export default function UploadRoute() {
           </Text>
         </TouchableOpacity>
       </View>
-
+      <View style={{ marginTop: 24, alignItems: "center" }}>
+        <BannerAd
+          unitId={TestIds.BANNER}
+          size={BannerAdSize.BANNER}
+          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+        />
+      </View>
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
